@@ -1,9 +1,5 @@
 # ⚡ EV Charging Analytics Dashboard
 
-
-![Header](https://raw.githubusercontent.com/tarekmasryo/EV-Charging-Analytics/main/assets/header.png)
-
-
 [![Streamlit](https://img.shields.io/badge/Powered%20by-Streamlit-FF4B4B)](https://streamlit.io/)  
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)  
 [![Data License: CC BY 4.0](https://img.shields.io/badge/Data%20License-CC%20BY%204.0-lightgrey.svg)](DATA_LICENSE)  
@@ -16,6 +12,9 @@
 ![Dashboard GIF](assets/Analytics.gif)
 
 ---
+
+![Header](https://raw.githubusercontent.com/tarekmasryo/EV-Charging-Analytics/main/assets/header.png)
+
 
 ## 📌 Overview
 
