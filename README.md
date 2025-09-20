@@ -96,3 +96,9 @@ DATA_URL = "https://raw.githubusercontent.com/tarekmasryo/Global-EV-Charging-Sta
 If you use this dashboard or dataset, please credit as:
 
 > Dashboard and dataset sourced from *Global EV Charging Stations & Models (2025)* by Tarek Masryo, licensed under MIT (code) and CC BY 4.0 (data).
+
+---
+
+## Related Repositories
+- 📂 [Global EV Charging Dataset](https://github.com/tarekmasryo/global-ev-charging-dataset)
+- 🔍 [EV Charging EDA](https://github.com/tarekmasryo/ev-charging-eda)
