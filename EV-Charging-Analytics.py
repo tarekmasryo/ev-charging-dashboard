@@ -20,7 +20,7 @@ st.set_page_config(
 PLOTLY_CONFIG = {"displaylogo": False, "modeBarButtonsToRemove": ["lasso2d", "select2d"]}
 
 DATA_REPO_URL = "https://github.com/tarekmasryo/Global-EV-Charging-Stations"
-RAW_DEFAULT_URL = "https://raw.githubusercontent.com/tarekmasryo/Global-EV-Charging-Stations/main/data/charging_stations_2025_world.csv"
+RAW_DEFAULT_URL = "https://raw.githubusercontent.com/tarekmasryo/Global-EV-Charging-Stations/main/data/charging_station.csv"
 KAGGLE_DEFAULT_PATH = "/kaggle/input/global-ev-charging-stations/charging_station.csv"
 
 REQUIRED_COLS = {
@@ -542,4 +542,5 @@ elif page == "Insights":   page_insights(view_df)
 elif page == "Optimizer":  page_optimizer(view_df)
 elif page == "Compare":    page_compare(view_df)
 elif page == "Stations":   page_stations(view_df)
+
 
