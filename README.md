@@ -77,7 +77,7 @@ Make sure your **secrets / env** point to the dataset URL:
 
 ```toml
 # .streamlit/secrets.toml
-DATA_URL = "https://raw.githubusercontent.com/tarekmasryo/Global-EV-Charging-Stations/main/data/charging_stations_2025_world.csv"
+DATA_URL = "https://raw.githubusercontent.com/tarekmasryo/global-ev-infra-data/main/data/charging_station.csv"
 ```
 
 
