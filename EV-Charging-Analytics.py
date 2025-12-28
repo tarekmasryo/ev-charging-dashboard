@@ -146,7 +146,7 @@ def lorenz_curve(values: pd.Series):
     cum = np.cumsum(xs)
     L = np.insert(cum/cum[-1], 0, 0)
     X = np.linspace(0, 1, len(L))
-    gini = 1 - 2*np.trapz(L, X)
+    gini = 1 - 2*np.trapezoid(L, X)
     return X, L, gini
 
 def pareto_table(g, col="total_ports"):
@@ -542,5 +542,6 @@ elif page == "Insights":   page_insights(view_df)
 elif page == "Optimizer":  page_optimizer(view_df)
 elif page == "Compare":    page_compare(view_df)
 elif page == "Stations":   page_stations(view_df)
+
 
 
