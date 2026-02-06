@@ -57,8 +57,8 @@ Interactive dashboard built with **Streamlit, Plotly, and PyDeck** to explore th
 Clone the repo and install requirements:
 
 ```bash
-git clone https://github.com/tarekmasryo/ev-charging-analytics.git
-cd ev-charging-analytics
+git clone https://github.com/tarekmasryo/ev-charging-dashboard.git
+cd ev-charging-dashboard
 pip install -r requirements.txt
 ```
 
