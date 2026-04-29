@@ -52,3 +52,22 @@ def test_drops_missing_lat_lon(tmp_path) -> None:
     out = load_main(str(p))
     assert len(out) == 1
     assert int(out.iloc[0]["id"]) == 2
+
+
+def test_is_fast_dc_string_values_are_parsed_explicitly(tmp_path) -> None:
+    df = pd.concat(
+        [
+            _make_df(id=1, is_fast_dc="False", power_kw=350.0),
+            _make_df(id=2, is_fast_dc="0", power_kw=350.0),
+            _make_df(id=3, is_fast_dc="true", power_kw=20.0),
+            _make_df(id=4, is_fast_dc="yes", power_kw=20.0),
+        ],
+        ignore_index=True,
+    )
+    p = tmp_path / "bools.csv"
+    df.to_csv(p, index=False)
+
+    out = load_main(str(p))
+
+    assert out["is_fast_dc"].tolist() == [False, False, True, True]
+

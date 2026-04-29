@@ -84,9 +84,36 @@ def _derive_power_class(power_kw: pd.Series) -> pd.Series:
     return out.astype("object").where(s > 0.0, other="Unknown")
 
 
+TRUE_VALUES = {"1", "true", "t", "yes", "y"}
+FALSE_VALUES = {"0", "false", "f", "no", "n", "", "nan", "none", "null"}
+
+
 def _derive_is_fast_dc(power_kw: pd.Series) -> pd.Series:
     s = pd.to_numeric(power_kw, errors="coerce").fillna(0.0)
     return (s >= 150.0).astype(bool)
+
+
+def _parse_bool_series(values: pd.Series) -> pd.Series:
+    """Parse common boolean encodings without treating non-empty strings as True."""
+    if pd.api.types.is_bool_dtype(values):
+        return values.fillna(False).astype(bool)
+
+    numeric = pd.to_numeric(values, errors="coerce")
+    text = values.astype(str).str.strip().str.lower()
+
+    parsed = text.map(
+        lambda value: True
+        if value in TRUE_VALUES
+        else False
+        if value in FALSE_VALUES
+        else None
+    )
+
+    parsed = parsed.where(
+        parsed.notna(),
+        numeric.map(lambda value: bool(value) if pd.notna(value) else False),
+    )
+    return parsed.fillna(False).astype(bool)
 
 
 def load_main(source: Any) -> pd.DataFrame:
@@ -101,8 +128,14 @@ def load_main(source: Any) -> pd.DataFrame:
 
     out["id"] = out["id"].astype(str)
     out["name"] = out.get("name", pd.Series(index=out.index, dtype="object")).astype("object")
-    out["country_code"] = out["country_code"].astype(str).str.upper()
-    out["city"] = out["city"].astype(str).replace({"nan": "Unknown"}).fillna("Unknown")
+    out["country_code"] = out["country_code"].astype(str).str.strip().str.upper()
+    out["city"] = (
+        out["city"]
+        .astype(str)
+        .str.strip()
+        .replace({"": "Unknown", "nan": "Unknown", "none": "Unknown", "null": "Unknown"})
+        .fillna("Unknown")
+    )
 
     for col in ["latitude", "longitude", "ports", "power_kw"]:
         out[col] = pd.to_numeric(out[col], errors="coerce")
@@ -115,7 +148,7 @@ def load_main(source: Any) -> pd.DataFrame:
     if "is_fast_dc" not in out.columns:
         out["is_fast_dc"] = _derive_is_fast_dc(out["power_kw"])
     else:
-        out["is_fast_dc"] = out["is_fast_dc"].astype(bool)
+        out["is_fast_dc"] = _parse_bool_series(out["is_fast_dc"])
 
     if "power_class" not in out.columns:
         out["power_class"] = _derive_power_class(out["power_kw"])

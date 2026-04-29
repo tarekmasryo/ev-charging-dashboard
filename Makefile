@@ -1,7 +1,9 @@
-.PHONY: run lint format test
+.PHONY: run lint format format-check test
+
+APP_FILE := EV-Charging-Analytics.py
 
 run:
-	streamlit run app.py
+	python -m streamlit run $(APP_FILE)
 
 lint:
 	ruff check .
@@ -9,5 +11,8 @@ lint:
 format:
 	ruff format .
 
+format-check:
+	ruff format --check .
+
 test:
-	pytest
+	pytest -q

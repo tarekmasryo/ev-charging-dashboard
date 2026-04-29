@@ -4,55 +4,62 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg)](https://docs.astral.sh/ruff/)
 
-Production-style **Streamlit** dashboard for exploring global EV charging infrastructure with **Plotly** and **PyDeck**.  
-The repo is structured as a package (`src/`), with automated checks (Ruff) and a test suite (Pytest).
+Production-style **Streamlit** dashboard for exploring global EV charging infrastructure with **Plotly** and **PyDeck**.
 
----
+It is designed as a decision-facing analytics tool: infrastructure KPIs, geographic coverage, fast-DC mix, inequality metrics, opportunity scoring, and allocation scenarios.
 
-## 🎥 Live Preview
-
-![Dashboard GIF](assets/Analytics.gif)
+![Dashboard Preview](assets/header.png)
 
 ---
 
 ## 📌 Overview
 
-This dashboard explores the **Global EV Charging Stations & Models Dataset (2025)**:
+This dashboard explores the **Global EV Charging Stations Dataset**:
 
-- 🌍 242k+ charging stations across 121 countries
-- 🎛️ Filters: country, power class, fast-DC, ports
-- 📊 KPIs and distribution insights (including Lorenz curve + Gini)
-- 🗺️ Interactive world map with clustering
+- 🌍 Charging stations across multiple countries
+- 🎛️ Filters for country, city, power class, fast-DC status, and port range
+- 📊 KPIs for stations, ports, average power, and fast-DC share
+- 📈 Distribution analytics including Lorenz curve and Gini concentration
+- 🗺️ Interactive world map with port-scaled station markers
 - 🧮 Allocation optimizer for fast-DC expansion scenarios
+- 🧭 Compare mode for selected slices vs global or preset views
 
-📦 Dataset repository:
-- https://github.com/tarekmasryo/Global-EV-Charging-Stations
+Dataset repository:
+
+https://github.com/tarekmasryo/Global-EV-Charging-Stations
 
 ---
 
 ## 🖼️ Screenshots
 
-**Overview**  
+**Overview**
+
 ![Overview](assets/overview.png)
 
-**Map**  
+**Map**
+
 ![Map](assets/map.png)
 
-**Insights**  
+**Insights**
+
 ![Insights](assets/insights.png)
 
-**Optimizer**  
+**Optimizer**
+
 ![Optimizer](assets/optimizer.png)
 
 ---
 
 ## 🔑 Key Features
 
-- 🎛️ Country/city/power-class filters
-- 📈 KPIs: total stations, ports, avg kW, fast-DC share
-- 📊 Visuals: donut charts, bar charts, Lorenz curve + Gini
-- 🧮 Optimizer: simulate allocation of new fast-DC ports
-- 🧭 Compare mode: selected slice vs global
+- Country, city, power-class, fast-DC, and ports filters
+- Executive KPIs for charging infrastructure monitoring
+- Charging mix analysis by country and power class
+- Port concentration analysis with Pareto view, Lorenz curve, and Gini score
+- Impact and opportunity scoring for expansion prioritization
+- Interactive PyDeck map with station-level markers
+- Rule-based optimizer for allocating new fast-DC capacity
+- Export-ready tables for country summaries and scenario outputs
 
 ---
 
@@ -60,18 +67,27 @@ This dashboard explores the **Global EV Charging Stations & Models Dataset (2025
 
 ```text
 .
-├── app.py
+├── EV-Charging-Analytics.py
 ├── src/ev_charging_dashboard/
 │   ├── analytics.py
 │   ├── data.py
 │   ├── services.py
-│   └── ...
+│   └── __init__.py
 ├── tests/
 ├── assets/
 ├── requirements.txt
 ├── requirements-dev.txt
+├── Makefile
 └── pyproject.toml
 ```
+
+The Streamlit entrypoint is intentionally named:
+
+```text
+EV-Charging-Analytics.py
+```
+
+Keep this filename when deploying the dashboard.
 
 ---
 
@@ -80,52 +96,64 @@ This dashboard explores the **Global EV Charging Stations & Models Dataset (2025
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -U pip
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-streamlit run app.py
+python -m streamlit run EV-Charging-Analytics.py
 ```
 
-Notes:
-- `requirements.txt` installs the local package in editable mode (`-e .`) so `ev_charging_dashboard` imports work out of the box.
-- If PowerShell blocks activation:
-  `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+If PowerShell blocks activation, run this only for the current shell:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
 
 ---
 
 ## ⚙️ Data Configuration
 
-The app auto-loads the dataset from the public GitHub raw CSV by default.  
-You can override the data source in any of the following ways (highest priority first):
+The app auto-loads the dataset from the public GitHub raw CSV by default.
 
-1) 🔗 **Query param**: `?csv=<path_or_url>`
-2) 🔐 **Streamlit secrets** (`.streamlit/secrets.toml`):
+You can override the data source in any of the following ways, listed by priority:
+
+1. Query parameter: `?csv=<path_or_url>`
+2. Streamlit secrets file: `.streamlit/secrets.toml`
+
 ```toml
 DATA_URL = "https://raw.githubusercontent.com/tarekmasryo/Global-EV-Charging-Stations/main/data/charging_station.csv"
 ```
-3) 🌱 **Environment variables** (first one found is used): `CSV_URL`, `CSV_PATH`, `DATA_URL`
+
+3. Environment variables: `CSV_URL`, `CSV_PATH`, or `DATA_URL`
+4. Manual CSV upload from the sidebar
 
 Optional enrichment files:
-- 🌐 `world_population.csv`
-- 🧭 `country_region.csv`
 
-If these files are not present, related enrichment metrics will be skipped gracefully.
+- `world_population.csv`
+- `country_region.csv`
+
+When these files are missing, enrichment metrics are skipped gracefully.
 
 ---
 
-## ☁️ Deploy (Streamlit Community Cloud)
+## ☁️ Deploy on Streamlit Community Cloud
 
-1) Push this repository to GitHub.
-2) Create a new Streamlit Cloud app from the repo.
-3) Set `DATA_URL` in Streamlit **Secrets** (recommended), or rely on the default auto-load URL.
+1. Push this repository to GitHub.
+2. Create a new Streamlit Cloud app from the repository.
+3. Set the main file path to:
+
+```text
+EV-Charging-Analytics.py
+```
+
+4. Add `DATA_URL` in Streamlit Secrets when you want to override the default dataset URL.
 
 ---
 
 ## 🧪 Development
 
-Install dev tools:
+Install development tools:
 
 ```bash
-pip install -r requirements-dev.txt
+python -m pip install -r requirements-dev.txt
 pre-commit install
 ```
 
@@ -133,17 +161,25 @@ Run checks:
 
 ```bash
 ruff check .
-ruff format .
+ruff format --check .
 pytest -q
+```
+
+Or use:
+
+```bash
+make lint
+make format-check
+make test
 ```
 
 ---
 
 ## 📜 License & Attribution
 
-- ✅ Code: **Apache-2.0** (see `LICENSE`)
-- ✅ Dataset: hosted in the dataset repository (see link above)
+- Code: **Apache-2.0**. See `LICENSE`.
+- Dataset: hosted in the linked dataset repository.
 
-If you use the dashboard or dataset, please credit:
+Attribution:
 
 > Global EV Charging Dashboard and Dataset by **Tarek Masryo**.
