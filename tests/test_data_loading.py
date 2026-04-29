@@ -24,8 +24,10 @@ def test_missing_columns_raises(tmp_path) -> None:
     df = _make_df().drop(columns=["power_kw"])
     p = tmp_path / "bad.csv"
     df.to_csv(p, index=False)
+
     with pytest.raises(ValueError) as e:
         load_main(str(p))
+
     assert "missing required columns" in str(e.value).lower()
 
 
@@ -35,6 +37,7 @@ def test_cleaning_and_types(tmp_path) -> None:
     df.to_csv(p, index=False)
 
     out = load_main(str(p))
+
     assert set(REQUIRED_COLS).issubset(out.columns)
     assert out.loc[0, "ports"] == 1
     assert out.loc[0, "power_kw"] == 120.0
@@ -49,7 +52,9 @@ def test_drops_missing_lat_lon(tmp_path) -> None:
     df = pd.concat([_make_df(latitude=np.nan), _make_df(id=2)], ignore_index=True)
     p = tmp_path / "mix.csv"
     df.to_csv(p, index=False)
+
     out = load_main(str(p))
+
     assert len(out) == 1
     assert int(out.iloc[0]["id"]) == 2
 
@@ -70,4 +75,3 @@ def test_is_fast_dc_string_values_are_parsed_explicitly(tmp_path) -> None:
     out = load_main(str(p))
 
     assert out["is_fast_dc"].tolist() == [False, False, True, True]
-

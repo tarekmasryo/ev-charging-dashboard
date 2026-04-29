@@ -8,7 +8,10 @@ from typing import Any
 import pandas as pd
 
 DATA_REPO_URL = "https://github.com/tarekmasryo/Global-EV-Charging-Stations"
-RAW_DEFAULT_URL = "https://raw.githubusercontent.com/tarekmasryo/Global-EV-Charging-Stations/main/data/charging_station.csv"
+RAW_DEFAULT_URL = (
+    "https://raw.githubusercontent.com/tarekmasryo/Global-EV-Charging-Stations/"
+    "main/data/charging_station.csv"
+)
 KAGGLE_DEFAULT_PATH = "/kaggle/input/global-ev-charging-stations/charging_station.csv"
 
 REQUIRED_COLS = {
@@ -23,6 +26,9 @@ REQUIRED_COLS = {
 
 POP_PATH = "world_population.csv"
 REG_PATH = "country_region.csv"
+
+TRUE_VALUES = {"1", "true", "t", "yes", "y"}
+FALSE_VALUES = {"0", "false", "f", "no", "n", "", "nan", "none", "null"}
 
 
 def normalize_url(url: str) -> str:
@@ -63,8 +69,8 @@ def _canonicalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     for canonical, candidates in aliases.items():
         if canonical in df.columns:
             continue
-        for cand in candidates:
-            key = cand.lower()
+        for candidate in candidates:
+            key = candidate.lower()
             if key in lower_map:
                 rename[lower_map[key]] = canonical
                 break
@@ -84,13 +90,23 @@ def _derive_power_class(power_kw: pd.Series) -> pd.Series:
     return out.astype("object").where(s > 0.0, other="Unknown")
 
 
-TRUE_VALUES = {"1", "true", "t", "yes", "y"}
-FALSE_VALUES = {"0", "false", "f", "no", "n", "", "nan", "none", "null"}
-
-
 def _derive_is_fast_dc(power_kw: pd.Series) -> pd.Series:
     s = pd.to_numeric(power_kw, errors="coerce").fillna(0.0)
     return (s >= 150.0).astype(bool)
+
+
+def _parse_token_to_bool(value: str) -> bool | None:
+    if value in TRUE_VALUES:
+        return True
+    if value in FALSE_VALUES:
+        return False
+    return None
+
+
+def _numeric_to_bool(value: object) -> bool:
+    if pd.isna(value):
+        return False
+    return bool(value)
 
 
 def _parse_bool_series(values: pd.Series) -> pd.Series:
@@ -100,19 +116,9 @@ def _parse_bool_series(values: pd.Series) -> pd.Series:
 
     numeric = pd.to_numeric(values, errors="coerce")
     text = values.astype(str).str.strip().str.lower()
+    parsed = text.map(_parse_token_to_bool)
 
-    parsed = text.map(
-        lambda value: True
-        if value in TRUE_VALUES
-        else False
-        if value in FALSE_VALUES
-        else None
-    )
-
-    parsed = parsed.where(
-        parsed.notna(),
-        numeric.map(lambda value: bool(value) if pd.notna(value) else False),
-    )
+    parsed = parsed.where(parsed.notna(), numeric.map(_numeric_to_bool))
     return parsed.fillna(False).astype(bool)
 
 
@@ -127,13 +133,24 @@ def load_main(source: Any) -> pd.DataFrame:
     out = df.copy()
 
     out["id"] = out["id"].astype(str)
-    out["name"] = out.get("name", pd.Series(index=out.index, dtype="object")).astype("object")
+    out["name"] = (
+        out.get("name", pd.Series(index=out.index, dtype="object"))
+        .fillna("")
+        .astype("object")
+    )
     out["country_code"] = out["country_code"].astype(str).str.strip().str.upper()
     out["city"] = (
         out["city"]
         .astype(str)
         .str.strip()
-        .replace({"": "Unknown", "nan": "Unknown", "none": "Unknown", "null": "Unknown"})
+        .replace(
+            {
+                "": "Unknown",
+                "nan": "Unknown",
+                "none": "Unknown",
+                "null": "Unknown",
+            }
+        )
         .fillna("Unknown")
     )
 
