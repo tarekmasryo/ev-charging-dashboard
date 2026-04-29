@@ -134,9 +134,7 @@ def load_main(source: Any) -> pd.DataFrame:
 
     out["id"] = out["id"].astype(str)
     out["name"] = (
-        out.get("name", pd.Series(index=out.index, dtype="object"))
-        .fillna("")
-        .astype("object")
+        out.get("name", pd.Series(index=out.index, dtype="object")).fillna("").astype("object")
     )
     out["country_code"] = out["country_code"].astype(str).str.strip().str.upper()
     out["city"] = (
